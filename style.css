@@ -1,0 +1,158 @@
+@import url("https://fonts.googleapis.com/css2?family=Secular+One&family=VT323&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Buttons reset from https://gist.github.com/MoOx/9137295 */
+button {
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  overflow: visible;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  -webkit-font-smoothing: inherit;
+  -moz-osx-font-smoothing: inherit;
+  -webkit-appearance: none;
+}
+
+body {
+  background: #aaa;
+}
+
+.container {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  place-items: center;
+}
+
+.calculator {
+  background: #4467e7;
+  height: 510px;
+  width: 300px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 32px -11px rgba(0, 0, 0, 0.75);
+}
+
+/* Upper part with display */
+
+.top {
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.display {
+  height: 65px;
+  width: 250px;
+  background: black;
+  border-radius: 6px;
+  border: 5px solid #9c99a4;
+  background: #d3e3e3;
+  font-family: "VT323", monospace;
+  font-size: 50px;
+  text-align: right;
+  padding: 0 10px;
+  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.75);
+}
+
+/* Middle part with logo and solar panel */
+
+.middle {
+  height: 85px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.left {
+  color: #fefffc;
+  width: 140px;
+  display: flex;
+  justify-content: center;
+}
+
+.logo {
+  font-family: "Secular One", sans-serif;
+  font-size: 25px;
+}
+
+.right {
+  width: 160px;
+  display: flex;
+}
+
+.solar {
+  height: 43px;
+  width: 140px;
+  background: #232324;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-radius: 6px;
+  box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.75);
+}
+.block {
+  border-left: 4px solid #0f2123;
+}
+
+.block:first-child {
+  border-left: 0;
+}
+
+/* Keypad */
+
+.lower {
+  display: grid;
+  place-items: center;
+  margin-top: 20px;
+}
+
+.keypad {
+  width: 270px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 15px;
+}
+
+.key {
+  display: grid;
+  place-items: center;
+  font-family: "Secular One", sans-serif;
+  font-size: 30px;
+  background: #e4e4e4;
+  border-radius: 30px;
+  box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.75);
+  color: #1125b5;
+  outline: none;
+  cursor: pointer;
+}
+
+.key:active {
+  transform: translateY(2px);
+  box-shadow: 0px -1px 4px 1px rgba(0, 0, 0, 0.75);
+}
+
+#AC {
+  grid-column: 1 / span 3;
+  background-color: #f05661;
+}
+#add {
+  grid-column: 4 / span 1;
+  grid-row: 4 / span 2;
+}
+
+.sign {
+  font-size: 45px;
+  padding: 0;
+  line-height: 0;
+}
