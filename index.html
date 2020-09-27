@@ -11,7 +11,10 @@
       <div class="calculator">
         <div class="top">
           <div class="display-wrapper">
-            <div class="display">123456</div>
+            <div class="display">
+              <span class="minus hidden">-</span
+              ><span class="display-number"></span>
+            </div>
           </div>
         </div>
 
@@ -31,26 +34,27 @@
 
         <div class="lower">
           <div class="keypad">
-            <button class="key" id="AC">AC</button>
-            <button class="key sign" id="divide">&divide;</button>
-            <button class="key" id="7">7</button>
-            <button class="key" id="8">8</button>
-            <button class="key" id="9">9</button>
-            <button class="key sign" id="times">&times;</button>
-            <button class="key" id="4">4</button>
-            <button class="key" id="5">5</button>
-            <button class="key" id="6">6</button>
-            <button class="key sign" id="substract">-</button>
-            <button class="key" id="1">1</button>
-            <button class="key" id="2">2</button>
-            <button class="key" id="3">3</button>
-            <button class="key sign" id="add">+</button>
-            <button class="key" id="0">0</button>
-            <button class="key" id="dot">.</button>
-            <button class="key sign" id="equals">=</button>
+            <button class="key clear" id="AC" data-key="Delete">AC</button>
+            <button class="key sign" id="divide" data-key="/">&divide;</button>
+            <button class="key number" id="7" data-key="7">7</button>
+            <button class="key number" id="8" data-key="8">8</button>
+            <button class="key number" id="9" data-key="9">9</button>
+            <button class="key sign" id="multiply" data-key="*">&times;</button>
+            <button class="key number" id="4" data-key="4">4</button>
+            <button class="key number" id="5" data-key="5">5</button>
+            <button class="key number" id="6" data-key="6">6</button>
+            <button class="key sign" id="substract" data-key="-">-</button>
+            <button class="key number" id="1" data-key="1">1</button>
+            <button class="key number" id="2" data-key="2">2</button>
+            <button class="key number" id="3" data-key="3">3</button>
+            <button class="key sign" id="add" data-key="+">+</button>
+            <button class="key number" id="0" data-key="0">0</button>
+            <button class="key sign" id="dot" data-key=".">.</button>
+            <button class="key sign" id="equals" data-key="Enter">=</button>
           </div>
         </div>
       </div>
     </main>
   </body>
+  <script src="app.js"></script>
 </html>
