@@ -138,24 +138,28 @@
 (function () {
   const keys = document.querySelectorAll(".key");
 
-  //////////////// TODO clean up selectors and functions down here
-  //////////////// TODO chain calculations
+  //////////////// TODO fix chained expressions with = after
   //////////////// TODO round decimals
   //////////////// TODO add backspace
   //////////////// TODO add . support
   //////////////// TODO keyboard support
 
   keys.forEach((key) => {
-    if (key.classList.contains("clear")) {
-      key.addEventListener("click", setLastKey);
-      key.addEventListener("click", clearAll);
-    }
-    if (key.classList.contains("sign")) {
-      key.addEventListener("click", performOperator);
-    }
-    if (key.classList.contains("number")) {
-      key.addEventListener("click", setLastKey);
-      key.addEventListener("click", addNumber);
+    switch (key.dataset.type) {
+      case "operator":
+        key.addEventListener("click", performOperator);
+        key.addEventListener("click", setLastKey);
+        break;
+      case "number":
+        key.addEventListener("click", addNumber);
+        key.addEventListener("click", setLastKey);
+        break;
+      case "equals":
+        key.addEventListener("click", calculate);
+        break;
+      case "clear":
+        key.addEventListener("click", clearAll);
+        break;
     }
   });
 
@@ -178,15 +182,18 @@
   }
 
   function performOperator(event) {
-    if (event.target.id == "equals") {
-      calculate();
-    } else {
-      memory.setOperator(event.target.id);
-      if (memory.getLastKey !== "equals") {
-        memory.moveCurrToPrev();
-      }
-      memory.setCurrentNumber("");
+    memory.setOperator(event.target.id);
+    if (memory.getLastKey !== "equals") {
+      // Allows to chain expression after equal sign
+      let currNum = memory.getCurrentNumber();
+      let prevNum = memory.getPreviousNumber();
+      const currOperator = memory.getOperator();
+      let result = operate(prevNum, currNum, currOperator);
+      display.show(result);
+      memory.setCurrentNumber(result);
+      memory.moveCurrToPrev();
     }
+    memory.setCurrentNumber("");
   }
 
   function calculate() {
@@ -196,11 +203,13 @@
     let result = null;
 
     if (prevNum.length == 0) {
+      // Allows to perform operation without inputing firt number
       prevNum = currNum;
       memory.moveCurrToPrev();
     }
 
     if (memory.getLastKey() == "equals") {
+      // Allows to repeat previous operation with equal sign
       result = operate(currNum, prevNum, currOperator);
     } else {
       result = operate(prevNum, currNum, currOperator);
