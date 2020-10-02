@@ -1,24 +1,131 @@
-// Calculator module
+//////////////// TODO add backspace
+//////////////// TODO add . support
+
+// Calculator + Memory module version 3
 (function () {
-  const calculator = {
-    add(a, b) {
-      return a + b;
+  const lastExpression = {
+    number: null,
+    operator: null,
+    empty: true,
+    performOn: function (inputNumber) {
+      return operate(inputNumber, this.number, this.operator);
     },
-    substract(a, b) {
-      return a - b;
+    save: function (inputNumber, inputOperator) {
+      this.number = inputNumber;
+      this.operator = inputOperator;
+      this.empty = false;
     },
-    multiply(a, b) {
-      return a * b;
-    },
-    divide(a, b) {
-      if (b === 0) return "Error";
-      else return a / b;
+    clear: function () {
+      this.number = null;
+      this.operator = null;
+      this.empty = true;
     },
   };
-  function operate(a, b, operator) {
-    return calculator[operator](+a, +b).toString();
+
+  let lastKey = null;
+  let currNum = null;
+  let prevNum = null;
+  let currOp = null;
+
+  function clearCalculator() {
+    lastExpression.clear();
+    lastKey = null;
+    currNum = null;
+    prevNum = null;
+    currOp = null;
   }
-  window.operate = operate;
+
+  function calculate(input, dataType) {
+    let currentOutput;
+    switch (dataType) {
+      case "number":
+        currentOutput = calculateNumber(input);
+        break;
+      case "operator":
+        currentOutput = calculateOperator(input);
+        break;
+      case "equals":
+        currentOutput = calculateEquals();
+        break;
+    }
+    lastKey = dataType;
+    return currentOutput;
+  }
+
+  function calculateNumber(number) {
+    if (lastKey === "number") {
+      if (currNum.toString().length < 9) currNum = +(currNum.toString() + number.toString());
+    } else {
+      currNum = number;
+    }
+    return currNum;
+  }
+
+  function calculateEquals() {
+    if (currNum === null || !currOp) return +currNum; // Initial = press without any previous input
+    let result;
+    switch (lastKey) {
+      case "equals":
+        // Chained equals - repeats previous operation on result of previous
+        result = lastExpression.performOn(currNum);
+        break;
+      case "operator":
+        // Equals after any other operator returns the operation on the same numbers
+        result = operate(currNum, currNum, currOp);
+        lastExpression.save(currNum, currOp);
+        break;
+      case "number":
+        result = operate(prevNum, currNum, currOp);
+        lastExpression.save(currNum, currOp);
+        break;
+    }
+    currNum = result;
+    currOp = "equals";
+    return result;
+  }
+
+  function calculateOperator(input) {
+    if (currNum === null) {
+      // Initial operator keypress allowing to operate on initial 0
+      prevNum = +currNum;
+    }
+
+    if (lastKey === "number") {
+      if (currOp === null || currOp === "equals") {
+        // On initial number input or number input after expression result
+        prevNum = +currNum;
+        lastExpression.clear();
+      } else {
+        let result = operate(prevNum, currNum, currOp);
+        lastExpression.save(currNum, currOp);
+        prevNum = result;
+        currNum = result;
+      }
+    }
+
+    currOp = input;
+    prevNum = +currNum;
+    return +currNum;
+  }
+
+  function operate(num1, num2, operator) {
+    let a = +num1;
+    let b = +num2;
+    switch (operator) {
+      case "add":
+        return a + b;
+      case "substract":
+        return a - b;
+      case "multiply":
+        return a * b;
+      case "divide":
+        if (b === 0) return "Error";
+        return a / b;
+    }
+  }
+
+  window.clearCalculator = clearCalculator;
+  window.calculate = calculate;
 })();
 
 // Display module
@@ -28,28 +135,32 @@
 
   function show(text) {
     clear(); // Resets display each time
-    if (isWrong(text)) {
-      // Output check to limit displayed numbers to 9
-      displayNumber.innerText = "Error";
-    } else {
-      if (+text < 0) {
-        showMinus(); // Calculator style minus floated to the left of the display
-        text = text.slice(1);
-      }
-      displayNumber.innerText = text;
+    let currText = text;
+
+    if (currText.length > 9) {
+      currText = handleLongNum(text);
     }
+
+    if (+currText < 0) {
+      showMinus();
+      currText = currText.slice(1);
+    }
+
+    displayNumber.innerText = currText;
   }
 
-  function isWrong(text) {
-    if (isNaN(text)) {
-      return true;
+  function handleLongNum(num) {
+    let currNum = +num;
+    let limit = currNum < 0 ? 8 : 7; // Minus doesn't influence number of digits displayed
+
+    // Handle long decimal
+    if (num.indexOf(".") !== -1 && num.indexOf(".") < limit) {
+      currNum = currNum.toPrecision(7 - num.indexOf("."));
     }
-    if (+text < 0 && text.length > 11) {
-      return true;
+    if (num.length > limit + 2) {
+      return "Error";
     }
-    if (+text > 0 && text.length > 10) {
-      return true;
-    }
+    return currNum.toString();
   }
 
   function clear() {
@@ -73,151 +184,32 @@
   window.display = display;
 })();
 
-// Memory module
-(function () {
-  let currentNumber = "";
-  let previousNumber = "";
-  let currentOperator = "";
-  let lastKey = "";
-
-  function setCurrentNumber(number) {
-    currentNumber = number.toString();
-  }
-
-  function getCurrentNumber() {
-    return currentNumber;
-  }
-
-  function moveCurrToPrev() {
-    previousNumber = currentNumber;
-  }
-
-  function getPreviousNumber() {
-    return previousNumber;
-  }
-
-  function setOperator(operator) {
-    currentOperator = operator.toString();
-  }
-
-  function getOperator() {
-    return currentOperator;
-  }
-
-  function setLastKey(key) {
-    lastKey = key;
-  }
-
-  function getLastKey() {
-    return lastKey;
-  }
-
-  function clear() {
-    currentNumber = "";
-    previousNumber = "";
-    currentOperator = "";
-    lastKey = "";
-  }
-
-  const memory = {
-    setCurrentNumber,
-    getCurrentNumber,
-    moveCurrToPrev,
-    getPreviousNumber,
-    setOperator,
-    getOperator,
-    setLastKey,
-    getLastKey,
-    clear,
-  };
-
-  window.memory = memory;
-})();
-
-// Keys and functionality module
+// UI module
 (function () {
   const keys = document.querySelectorAll(".key");
 
-  //////////////// TODO fix chained expressions with = after
-  //////////////// TODO round decimals
-  //////////////// TODO add backspace
-  //////////////// TODO add . support
-  //////////////// TODO keyboard support
-
-  keys.forEach((key) => {
-    switch (key.dataset.type) {
-      case "operator":
-        key.addEventListener("click", performOperator);
-        key.addEventListener("click", setLastKey);
-        break;
-      case "number":
-        key.addEventListener("click", addNumber);
-        key.addEventListener("click", setLastKey);
-        break;
-      case "equals":
-        key.addEventListener("click", calculate);
-        break;
-      case "clear":
-        key.addEventListener("click", clearAll);
-        break;
-    }
+  keys.forEach(key => {
+    key.addEventListener("click", executeKeyPress);
   });
 
-  function clearAll() {
-    memory.clear();
-    display.clear();
-  }
+  window.addEventListener("keypress", activateKey);
 
-  function setLastKey(event) {
-    memory.setLastKey(event.target.id);
-  }
-
-  function addNumber(event) {
-    let currNum = memory.getCurrentNumber();
-    currNum += event.target.dataset.key;
-    if (currNum.length < 10) {
-      memory.setCurrentNumber(currNum);
-      display.show(currNum);
+  function activateKey(event) {
+    let key = document.querySelector(`.key[data-key="${event.key}"]`);
+    if (key) {
+      key.click();
     }
   }
 
-  function performOperator(event) {
-    memory.setOperator(event.target.id);
-    if (memory.getLastKey !== "equals") {
-      // Allows to chain expression after equal sign
-      let currNum = memory.getCurrentNumber();
-      let prevNum = memory.getPreviousNumber();
-      const currOperator = memory.getOperator();
-      let result = operate(prevNum, currNum, currOperator);
-      display.show(result);
-      memory.setCurrentNumber(result);
-      memory.moveCurrToPrev();
-    }
-    memory.setCurrentNumber("");
-  }
-
-  function calculate() {
-    let currNum = memory.getCurrentNumber();
-    let prevNum = memory.getPreviousNumber();
-    const currOperator = memory.getOperator();
-    let result = null;
-
-    if (prevNum.length == 0) {
-      // Allows to perform operation without inputing firt number
-      prevNum = currNum;
-      memory.moveCurrToPrev();
-    }
-
-    if (memory.getLastKey() == "equals") {
-      // Allows to repeat previous operation with equal sign
-      result = operate(currNum, prevNum, currOperator);
+  function executeKeyPress(e) {
+    let keyType = e.target.dataset.type;
+    let key = e.target.id;
+    if (keyType === "clear") {
+      clearCalculator();
+      display.clear();
     } else {
-      result = operate(prevNum, currNum, currOperator);
-      memory.moveCurrToPrev();
+      let output = calculate(key, keyType).toString();
+      display.show(output);
     }
-
-    display.show(result);
-    memory.setCurrentNumber(result);
-    memory.setLastKey("equals");
   }
 })();
